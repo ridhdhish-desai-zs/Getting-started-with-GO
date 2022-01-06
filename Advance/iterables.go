@@ -63,4 +63,14 @@ func main() {
 	fmt.Println(s[:5])
 
 	fmt.Println(appendByte([]byte{1, 2}, 10, 20, 30, 40))
+
+	var slice []int
+
+	slice = append(slice, 1)
+	slice = append(slice, 2)
+	slice = append(slice, 3)
+	slice = append(slice, 4, 5, 6, 7, 8)
+
+	fmt.Println(len(slice), cap(slice))
+
 }
