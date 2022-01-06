@@ -6,15 +6,14 @@ func Square(x int) int {
 	return x * x
 }
 
-func myMap(slice []int, sq func(x int) int) []int {
+func myMap(slice []int, sq func(x int) int) map[int]int {
+	squareMap := make(map[int]int)
 
-	results := make([]int, len(slice))
-
-	for k, v := range slice {
-		results[k] = sq(v)
+	for _, v := range slice {
+		squareMap[v] = sq(v)
 	}
 
-	return results
+	return squareMap
 }
 
 func main() {
