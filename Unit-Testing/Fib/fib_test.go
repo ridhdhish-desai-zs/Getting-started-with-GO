@@ -1,7 +1,6 @@
 package testing
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -13,13 +12,20 @@ func TestFib(t *testing.T) {
 	}{
 		{"Case 1", 1, 1},
 		{"Case 2", 2, 1},
+		{desc: "Case 3", input: -1},
 	}
 
 	for _, tf := range testFib {
 		t.Run(tf.desc, func(t *testing.T) {
-			output := fib(tf.input)
+			output, err := fib(tf.input)
+
+			// Uncomment only after implementation of error case
+			if err != nil {
+				t.Errorf("Error: %s", err)
+			}
+
 			if output != tf.expected {
-				fmt.Printf("Expected: %d, Got: %d\n", tf.expected, output)
+				t.Errorf("Expected: %d, Got: %d\n", tf.expected, output)
 			}
 		})
 	}
