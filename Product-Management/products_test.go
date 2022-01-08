@@ -22,7 +22,11 @@ func TestGetProducts(t *testing.T) {
 
 	for _, v := range tp {
 		t.Run(v.desc, func(t *testing.T) {
-			output := GetProducts()
+			output, err := GetProducts()
+
+			if err != nil {
+				t.Fatalf("%s", err)
+			}
 
 			if len(output) != len(v.expected) {
 				t.Errorf("Expected Products: %d, Got Products: %d", len(v.expected), len(output))
@@ -54,7 +58,11 @@ func TestAddProduct(t *testing.T) {
 
 	for _, v := range tp {
 		t.Run(v.desc, func(t *testing.T) {
-			output := AddProduct(v.id, v.name)
+			output, err := AddProduct(v.id, v.name)
+
+			if err != nil {
+				t.Fatalf("%s", err)
+			}
 
 			if output != v.expected {
 				t.Errorf("Expected: %d, %s; Got: %d, %s", v.expected.id, v.expected.name, output.id, output.name)
@@ -76,7 +84,11 @@ func TestDeleteProduct(t *testing.T) {
 
 	for _, v := range tp {
 		t.Run(v.desc, func(t *testing.T) {
-			output := DeleteProduct(v.id)
+			output, err := DeleteProduct(v.id)
+
+			if err != nil {
+				t.Fatalf("%s", err)
+			}
 
 			if output != v.expected {
 				t.Errorf("Expected: %d, %s; Got: %d, %s", v.expected.id, v.expected.name, output.id, output.name)
