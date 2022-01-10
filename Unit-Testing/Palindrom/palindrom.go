@@ -1,6 +1,8 @@
 package testing
 
-import "strings"
+import (
+	"strings"
+)
 
 func isPalindrom(str string) bool {
 	str = strings.ToLower(str)
@@ -10,13 +12,17 @@ func isPalindrom(str string) bool {
 	for i < len(str)/2 {
 
 		if str[i] < 97 || str[i] > 122 {
-			i++
-			continue
+			if !(str[i] >= 48 && str[i] <= 57) {
+				i++
+				continue
+			}
 		}
 
 		if str[j] < 97 || str[j] > 122 {
-			j--
-			continue
+			if !(str[j] >= 48 && str[j] <= 57) {
+				j--
+				continue
+			}
 		}
 
 		if str[i] != str[j] {

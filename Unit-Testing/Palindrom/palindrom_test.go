@@ -1,9 +1,10 @@
 package testing
 
 import (
-	"fmt"
 	"testing"
 )
+
+// TODO: Check for numbers
 
 func TestPalindrom(t *testing.T) {
 
@@ -12,13 +13,13 @@ func TestPalindrom(t *testing.T) {
 		input    string
 		expected bool
 	}{
-		{desc: "Case1", input: "A man, a plan, a canal. Panama", expected: true},
+		{desc: "Case1", input: "0A man, a plan, a canal. Panama9", expected: false},
+		{desc: "Case2", input: "0A man, a plan, a canal. Panama0", expected: true},
 	}
 
 	for _, tp := range testPalindrom {
 		t.Run(tp.desc, func(t *testing.T) {
 			output := isPalindrom(tp.input)
-			fmt.Println(output)
 			if output != tp.expected {
 				t.Errorf("%t", output)
 			}
