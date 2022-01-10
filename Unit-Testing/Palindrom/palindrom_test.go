@@ -4,8 +4,6 @@ import (
 	"testing"
 )
 
-// TODO: Check for numbers
-
 func TestPalindrom(t *testing.T) {
 
 	testPalindrom := []struct {
