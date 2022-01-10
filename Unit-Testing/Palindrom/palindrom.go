@@ -1,14 +1,31 @@
 package testing
 
-func reverseString(str string) (result string) {
-	for _, v := range str {
-		result = string(v) + result
-	}
-	return
-}
+import "strings"
 
 func isPalindrom(str string) bool {
-	revStr := reverseString(str)
+	str = strings.ToLower(str)
 
-	return revStr == str
+	i, j := 0, len(str)-1
+
+	for i < len(str)/2 {
+
+		if str[i] < 97 || str[i] > 122 {
+			i++
+			continue
+		}
+
+		if str[j] < 97 || str[j] > 122 {
+			j--
+			continue
+		}
+
+		if str[i] != str[j] {
+			return false
+		}
+
+		i++
+		j--
+	}
+
+	return true
 }
