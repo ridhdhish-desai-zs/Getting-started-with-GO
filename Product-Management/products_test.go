@@ -96,3 +96,45 @@ func TestDeleteProduct(t *testing.T) {
 		})
 	}
 }
+
+func TestSetName(t *testing.T) {
+	tp := []struct {
+		desc     string
+		name     string
+		expected string
+	}{
+		{desc: "Case1", name: "Dell Inspiron", expected: "Dell Inspiron"},
+	}
+
+	for _, v := range tp {
+		p1, _ := AddProduct(1, "")
+		p1.setName(v.name)
+
+		t.Run(v.desc, func(t *testing.T) {
+			if p1.name != v.expected {
+				t.Errorf("Expected: %v, Got: %v", v.expected, p1.name)
+			}
+		})
+	}
+}
+
+func TestSetId(t *testing.T) {
+	tp := []struct {
+		desc     string
+		id       int
+		expected int
+	}{
+		{desc: "Case1", id: 87, expected: 87},
+	}
+
+	for _, v := range tp {
+		output, _ := AddProduct(1, "Hey")
+		output.setId(v.id)
+
+		t.Run(v.desc, func(t *testing.T) {
+			if output.id != v.expected {
+				t.Errorf("Expected: %v, Got: %v", v.expected, output.id)
+			}
+		})
+	}
+}

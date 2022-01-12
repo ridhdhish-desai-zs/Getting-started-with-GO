@@ -51,3 +51,11 @@ func DeleteProduct(id int) (Product, error) {
 
 	return Product{}, nil
 }
+
+func (p *Product) setName(name string) {
+	p.name = name
+}
+
+func (p *Product) setId(id int) {
+	p.id = id
+}
