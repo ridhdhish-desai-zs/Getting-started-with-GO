@@ -1,0 +1,14 @@
+{
+    "animes": [
+        {
+            "name": "Naruto",
+            "protagonist": "Naruto",
+            "antagonist": "Madara Uchiha"
+        },
+        {
+            "name": "Demon Slayer",
+            "protagonist": "Tanjiro Kamado",
+            "antagonist": "Muzan"
+        }       
+    ]
+}
