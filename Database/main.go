@@ -8,8 +8,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-// TODO: Update function
-
 type User struct {
 	Id        int64
 	Name      string
@@ -60,9 +58,15 @@ func main() {
 			fmt.Println()
 			fmt.Println("--------Inserted Successfully--------")
 		case 2:
-			DeleteRecord(db, 1)
+			deleted := DeleteRecord(db, 100)
 			fmt.Println()
-			fmt.Println("---------Deleted Successfully--------")
+
+			if deleted {
+				fmt.Println("---------Deleted Successfully--------")
+			} else {
+				fmt.Printf("Cannot delete record with id %d, because record with id %d does not exist.", id, id)
+			}
+			fmt.Println()
 		case 3:
 			UpdateRecord(db, 1)
 			fmt.Println()
@@ -113,11 +117,16 @@ func UpdateRecord(db *sql.DB, id int) {
 }
 
 // Delete a perticular user and update the users list
-func DeleteRecord(db *sql.DB, id int) {
+func DeleteRecord(db *sql.DB, id int) bool {
 	queryString := "delete from users where id = ?"
 
-	_, err := db.Exec(queryString, id)
+	result, err := db.Exec(queryString, id)
 	checkNilError(err)
+	l, _ := result.RowsAffected()
+
+	if l == 0 {
+		return false
+	}
 
 	var index int
 
@@ -133,6 +142,8 @@ func DeleteRecord(db *sql.DB, id int) {
 	u := users[index]
 	u.IsDeleted = true
 	users[index] = u
+
+	return true
 }
 
 // Fetch all records of users
