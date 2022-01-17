@@ -33,6 +33,7 @@ func main() {
 	// Connect with database
 	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/test")
 	checkNilError(err)
+	defer db.Close()
 
 	_, err = db.Exec("create table  if not exists users(id int primary key AUTO_INCREMENT, name varchar(255) not null, age int not null, address varchar(255) not null)")
 	checkNilError(err)
