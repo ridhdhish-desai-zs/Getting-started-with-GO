@@ -20,7 +20,7 @@ func TestFetchRecords(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id", "name", "age", "address"}).AddRow(1, "Naruto", 21, "Surat")
 
-	mock.ExpectBegin()
+	// mock.ExpectBegin()
 
 	tests := []struct {
 		desc      string
@@ -40,6 +40,41 @@ func TestFetchRecords(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRead(t *testing.T) {
+	db, mock, err := sqlmock.New()
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	rows := sqlmock.NewRows([]string{"id", "name", "age", "address"}).AddRow(1, "Naruto", 21, "Japan").AddRow(2, "Ichigo", 18, "America")
+	rows2 := sqlmock.NewRows([]string{"id", "name", "age", "address"})
+
+	tests := []struct {
+		desc      string
+		expected  int64
+		mockQuery *sqlmock.ExpectedQuery
+	}{
+		{desc: "Case1", expected: 2, mockQuery: mock.ExpectQuery("select id from users").WillReturnRows(rows)},
+		{desc: "Case2", expected: 0, mockQuery: mock.ExpectQuery("select id from users").WillReturnRows(rows2)},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			affectedRows, err := Read(db)
+
+			if err != nil {
+				t.Errorf("Expected: %v, Got: %v", test.expected, affectedRows)
+			}
+
+			if affectedRows != test.expected {
+				t.Errorf("Expected: %v, Got: %v", test.expected, affectedRows)
+			}
+		})
+	}
+
 }
 
 func TestInsertRecord(t *testing.T) {

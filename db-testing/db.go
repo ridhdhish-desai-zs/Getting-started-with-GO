@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type User struct {
@@ -11,6 +13,21 @@ type User struct {
 	name    string
 	age     int
 	address string
+}
+
+func Read(db *sql.DB) (int64, error) {
+	rows, err := db.Query("select id from users")
+	count := 0
+
+	if err != nil {
+		return 0, errors.New("couldn't fetch records")
+	}
+
+	for rows.Next() {
+		count++
+	}
+
+	return int64(count), nil
 }
 
 func FetchRecords(db *sql.DB, id int) (User, error) {
@@ -73,6 +90,9 @@ func main() {
 	}
 
 	defer db.Close()
+
+	rows, _ := Read(db)
+	fmt.Print("TOtal: ", rows)
 
 	_, err = FetchRecords(db, 1)
 	if err != nil {
