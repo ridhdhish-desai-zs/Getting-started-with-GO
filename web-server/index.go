@@ -11,10 +11,10 @@ import (
 )
 
 type User struct {
-	Id      int
-	Name    string
-	Age     int
-	Address string
+	Id      int    `json:"id"`
+	Name    string `json:"name"`
+	Age     int    `json:"age"`
+	Address string `json:"address"`
 }
 
 var db *sql.DB
