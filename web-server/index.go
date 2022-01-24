@@ -22,7 +22,8 @@ var err error
 
 /*
 	Url: /api/users/{id}
-	Protected: false
+	Method: GET
+	Route: Unprotected
 	Description: Fetch Users or single user by Id
 */
 func FindUserByIdRequestHandler(res http.ResponseWriter, req *http.Request) {
@@ -44,19 +45,26 @@ func FindUserByIdRequestHandler(res http.ResponseWriter, req *http.Request) {
 
 	// Returning Error message if not record found
 	if err != nil {
-		res.Write([]byte(`{"error": "No record found for given id"}`))
+		_, err = res.Write([]byte(`{"error": "No record found for given id"}`))
+		if err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
 
 	// Returns null or user{}
 	jsonData, _ := json.Marshal(u)
-	res.Write([]byte(`{"data": {"user": ` + string(jsonData) + `}}`))
+	_, err = res.Write([]byte(`{"data": {"user": ` + string(jsonData) + `}}`))
+	if err != nil {
+		fmt.Println(err)
+	}
 
 }
 
 /*
 	Url: /api/users
-	Protected: false
+	Method: GET
+	Route: Unprotected
 	Description: Fetch Users or single user by Id
 */
 func UserRequestHandler(res http.ResponseWriter, req *http.Request) {
@@ -89,11 +97,40 @@ func UserRequestHandler(res http.ResponseWriter, req *http.Request) {
 	jsonData, _ := json.Marshal(users)
 
 	if string(jsonData) == "null" {
-		res.Write([]byte(`{"error": "No record found"}`))
+		_, err = res.Write([]byte(`{"error": "No record found"}`))
+		if err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
 
-	res.Write([]byte(`{"data": {"users": ` + string(jsonData) + `}}`))
+	_, err = res.Write([]byte(`{"data": {"users": ` + string(jsonData) + `}}`))
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+/*
+	Url: /api/users
+	Method: POST
+	Route: Unprotected
+	Description: Create new user
+*/
+func CreateUserRequestHandler(res http.ResponseWriter, req *http.Request) {
+	var u User
+
+	err := json.NewDecoder(req.Body).Decode(&u)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	result, err := db.Exec("insert into users(name, age, address) values(?, ?, ?)", u.Name, u.Age, u.Address)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Println(result.LastInsertId())
 }
 
 func main() {
@@ -107,8 +144,9 @@ func main() {
 
 	// Setting up mux (It's like express in node.js)
 	r := mux.NewRouter()
-	r.HandleFunc("/api/users", UserRequestHandler).Methods("POST", "GET")
-	r.HandleFunc("/api/users/{id}", FindUserByIdRequestHandler).Methods("POST", "GET")
+	r.HandleFunc("/api/users", UserRequestHandler).Methods("GET")
+	r.HandleFunc("/api/users/{id}", FindUserByIdRequestHandler).Methods("GET")
+	r.HandleFunc("/api/users", CreateUserRequestHandler).Methods("POST")
 
 	// Handling Get request to fetch User(s)
 	http.Handle("/", r)
