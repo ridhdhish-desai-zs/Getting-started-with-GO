@@ -19,10 +19,6 @@ func New(u stores.User) services.User {
 // implement middleware and send the response to http.
 
 func (st *User) GetUserById(id int) (models.User, error) {
-	if id == 0 {
-		return models.User{}, errors.New("Provide Id to fetch the user")
-	}
-
 	user, err := st.u.GetUserById(id)
 
 	if err != nil {
