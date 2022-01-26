@@ -37,3 +37,13 @@ func (st *User) GetUsers() ([]models.User, error) {
 
 	return users, nil
 }
+
+func (st *User) UpdateUser(id int, user models.User) (int, error) {
+	lastInsertedId, err := st.u.UpdateUser(id, user)
+
+	if err != nil {
+		return 0, errors.New("Could not able to update user for given id")
+	}
+
+	return lastInsertedId, nil
+}

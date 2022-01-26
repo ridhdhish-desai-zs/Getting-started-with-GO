@@ -54,3 +54,16 @@ func (u *dbStore) GetUsers() ([]models.User, error) {
 
 	return users, nil
 }
+
+// PUT /api/users
+func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
+	db := u.db
+
+	_, err := db.Exec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?", user.Name, user.Email, user.Phone, user.Age, id)
+
+	if err != nil {
+		return 0, errors.New("Could not update user for given id")
+	}
+
+	return id, nil
+}

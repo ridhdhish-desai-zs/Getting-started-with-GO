@@ -88,5 +88,43 @@ func TestGetUsers(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestUpdateUser(t *testing.T) {
+	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	tests := []struct {
+		desc     string
+		id       int
+		expected int
+		mockCall *sqlmock.ExpectedExec
+	}{
+		{
+			desc:     "Case1",
+			id:       1,
+			expected: 1,
+			mockCall: mock.ExpectExec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
+		},
+		{
+			desc:     "Case2",
+			id:       2,
+			expected: 0,
+			mockCall: mock.ExpectExec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21, 2).WillReturnError(errors.New("Invalid Id")),
+		},
+	}
+	userStore := New(db)
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			affectedRows, _ := userStore.UpdateUser(test.id, models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21})
+
+			if affectedRows != test.expected {
+				t.Errorf("Expected: %d, Got: %d", test.expected, affectedRows)
+			}
+		})
+	}
 }

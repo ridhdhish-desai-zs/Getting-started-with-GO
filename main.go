@@ -26,6 +26,7 @@ func main() {
 	router := mux.NewRouter()
 	router.Path("/api/users/{id}").Methods("GET").HandlerFunc(handler.GetUserByIdHandler)
 	router.Path("/api/users").Methods("GET").HandlerFunc(handler.GetUsersHandler)
+	router.Path("/api/users/{id}").Methods("PUT").HandlerFunc(handler.UpdateUserHandler)
 
 	http.Handle("/", router)
 

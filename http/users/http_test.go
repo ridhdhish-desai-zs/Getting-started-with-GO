@@ -1,6 +1,8 @@
 package users
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"layer/user/models"
 	"layer/user/services"
@@ -99,6 +101,70 @@ func TestGetUsersHandler(t *testing.T) {
 		res := httptest.NewRecorder()
 
 		h.GetUsersHandler(res, req)
+
+		if res.Code != test.expectedStatusCode {
+			t.Errorf("Expected Status Code: %v, Got: %v", test.expectedStatusCode, res.Code)
+		}
+	}
+}
+
+func TestUpdateUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUserService := services.NewMockUser(ctrl)
+	h := Handler{mockUserService}
+
+	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+
+	tests := []struct {
+		desc               string
+		id                 string
+		expectedStatusCode int
+		body               models.User
+		mockCall           *gomock.Call
+	}{
+		{
+			desc:               "Case1",
+			id:                 "1",
+			body:               testUser,
+			expectedStatusCode: http.StatusOK,
+			mockCall:           mockUserService.EXPECT().UpdateUser(1, testUser).Return(1, nil),
+		},
+		{
+			desc:               "Case2",
+			id:                 "2",
+			body:               testUser,
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           mockUserService.EXPECT().UpdateUser(2, testUser).Return(0, errors.New("Invalid Id")),
+		},
+		{
+			desc:               "Case3",
+			id:                 "1",
+			body:               models.User{},
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
+		{
+			desc:               "Case4",
+			id:                 "abcd",
+			body:               testUser,
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
+	}
+
+	for _, test := range tests {
+		// Setting up body of request
+		body, _ := json.Marshal(test.body)
+
+		// Creating test request and response object
+		req := httptest.NewRequest("PUT", "/api/users/"+test.id, bytes.NewBuffer(body))
+		res := httptest.NewRecorder()
+
+		req = mux.SetURLVars(req, map[string]string{
+			"id": test.id,
+		})
+
+		h.UpdateUserHandler(res, req)
 
 		if res.Code != test.expectedStatusCode {
 			t.Errorf("Expected Status Code: %v, Got: %v", test.expectedStatusCode, res.Code)

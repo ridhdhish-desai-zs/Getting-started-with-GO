@@ -5,6 +5,7 @@ import (
 	"layer/user/models"
 	"layer/user/services"
 	"net/http"
+	"reflect"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -71,4 +72,53 @@ func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 
 	data, _ := json.Marshal(users)
 	_, _ = res.Write(data)
+}
+
+/*
+URL: /api/users/{id}
+Method: PUT
+Route: Unprotected
+Description: Update user for given id
+*/
+func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-type", "application/json")
+
+	var user models.User
+
+	err := json.NewDecoder(req.Body).Decode(&user)
+
+	if err != nil || reflect.DeepEqual(user, models.User{}) {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Cannot parse request data"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	params := mux.Vars(req)
+	id := params["id"]
+
+	convId, err := strconv.Atoi(id)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Invalid id"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	_, err = h.S.UpdateUser(convId, user)
+
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	_, _ = res.Write([]byte(`{data: user updated successfully}`))
 }

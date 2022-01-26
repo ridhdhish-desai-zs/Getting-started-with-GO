@@ -88,3 +88,43 @@ func TestGetUsers(t *testing.T) {
 		})
 	}
 }
+
+func TestUpdateUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockUserStore := stores.NewMockUser(ctrl)
+	testUserService := New(mockUserStore)
+
+	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+
+	tests := []struct {
+		desc     string
+		id       int
+		expected int
+		mockCall *gomock.Call
+	}{
+		{
+			desc:     "Case1",
+			id:       1,
+			expected: 1,
+			mockCall: mockUserStore.EXPECT().UpdateUser(1, testUser).Return(1, nil),
+		},
+		{
+			desc:     "Case2",
+			id:       2,
+			expected: 0,
+			mockCall: mockUserStore.EXPECT().UpdateUser(2, testUser).Return(0, errors.New("Invalid id")),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			lastInsertedId, _ := testUserService.UpdateUser(test.id, testUser)
+
+			if lastInsertedId != test.expected {
+				t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
+			}
+		})
+	}
+}
