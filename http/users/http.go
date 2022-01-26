@@ -2,7 +2,6 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"layer/user/models"
 	"layer/user/services"
 	"net/http"
@@ -21,7 +20,7 @@ Method: GET
 Route: Unprotected
 Description: Fetch user by it's id
 */
-func (h Handler) UserById(res http.ResponseWriter, req *http.Request) {
+func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	params := mux.Vars(req)
@@ -30,7 +29,7 @@ func (h Handler) UserById(res http.ResponseWriter, req *http.Request) {
 
 	id, err := strconv.Atoi(userId)
 	if err != nil {
-		// TODO: Handle and return error response
+		res.WriteHeader(http.StatusBadRequest)
 		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Invalid User id"}
 		err, _ := json.Marshal(newError)
 		_, _ = res.Write(err)
@@ -39,15 +38,37 @@ func (h Handler) UserById(res http.ResponseWriter, req *http.Request) {
 
 	user, err := h.S.GetUserById(id)
 	if err != nil {
-		// TODO: Return status code and error message
-		fmt.Println(err)
+		res.WriteHeader(http.StatusBadRequest)
 		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. User id not found"}
-		err, _ := json.Marshal(newError)
-		_, _ = res.Write(err)
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
 		return
 	}
 
 	data, _ := json.Marshal(user)
 	_, _ = res.Write(data)
 
+}
+
+/*
+URL: /api/users
+Method: GET
+Route: Unprotected
+Description: Fetch all users
+*/
+func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-type", "application/json")
+
+	users, err := h.S.GetUsers()
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Could not fetch users"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	data, _ := json.Marshal(users)
+	_, _ = res.Write(data)
 }

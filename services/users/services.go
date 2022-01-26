@@ -27,3 +27,13 @@ func (st *User) GetUserById(id int) (models.User, error) {
 
 	return *user, nil
 }
+
+func (st *User) GetUsers() ([]models.User, error) {
+	users, err := st.u.GetUsers()
+
+	if err != nil {
+		return []models.User{}, errors.New("Cannot fetch users")
+	}
+
+	return users, nil
+}

@@ -12,6 +12,10 @@ import (
 	"github.com/gorilla/mux"
 )
 
+/*
+Test for Fetch User by Id
+/api/users/{id}
+*/
 func TestUserById(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserService := services.NewMockUser(ctrl)
@@ -34,18 +38,19 @@ func TestUserById(t *testing.T) {
 		{
 			desc:               "Case2",
 			id:                 "2",
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode: http.StatusBadRequest,
 			mockCall:           mockUserService.EXPECT().GetUserById(2).Return(models.User{}, errors.New("Invalid Id")),
 		},
 		{
 			desc:               "Case3",
 			id:                 "id",
-			expectedStatusCode: http.StatusOK,
+			expectedStatusCode: http.StatusBadRequest,
 			mockCall:           nil,
 		},
 	}
 
 	for _, test := range tests {
+		// Creating test request and response object
 		req := httptest.NewRequest("GET", "/api/users/"+test.id, nil)
 		res := httptest.NewRecorder()
 
@@ -53,7 +58,47 @@ func TestUserById(t *testing.T) {
 			"id": test.id,
 		})
 
-		h.UserById(res, req)
+		h.GetUserByIdHandler(res, req)
+
+		if res.Code != test.expectedStatusCode {
+			t.Errorf("Expected Status Code: %v, Got: %v", test.expectedStatusCode, res.Code)
+		}
+	}
+}
+
+func TestGetUsersHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUserService := services.NewMockUser(ctrl)
+	h := Handler{mockUserService}
+
+	data1 := []models.User{
+		{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
+		{Id: 2, Name: "Itachi", Email: "itachi@gmail.com", Phone: "8320578360", Age: 24},
+	}
+
+	tests := []struct {
+		desc               string
+		expectedStatusCode int
+		mockCall           *gomock.Call
+	}{
+		{
+			desc:               "Case1",
+			expectedStatusCode: http.StatusOK,
+			mockCall:           mockUserService.EXPECT().GetUsers().Return(data1, nil),
+		},
+		{
+			desc:               "Case2",
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           mockUserService.EXPECT().GetUsers().Return([]models.User{}, errors.New("Invalid Id")),
+		},
+	}
+
+	for _, test := range tests {
+		// Creating test request and response object
+		req := httptest.NewRequest("GET", "/api/users/", nil)
+		res := httptest.NewRecorder()
+
+		h.GetUsersHandler(res, req)
 
 		if res.Code != test.expectedStatusCode {
 			t.Errorf("Expected Status Code: %v, Got: %v", test.expectedStatusCode, res.Code)
