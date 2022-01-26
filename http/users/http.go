@@ -122,3 +122,39 @@ func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 
 	_, _ = res.Write([]byte(`{data: user updated successfully}`))
 }
+
+/*
+URL: /api/users/{id}
+Method: DELETE
+Route: Unprotected
+Description: Delete user for given id
+*/
+func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-type", "application/json")
+
+	params := mux.Vars(req)
+	id := params["id"]
+
+	convId, err := strconv.Atoi(id)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Invalid id"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	_, err = h.S.DeleteUser(convId)
+
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	_, _ = res.Write([]byte(`{data: user deleted successfully}`))
+}

@@ -47,3 +47,13 @@ func (st *User) UpdateUser(id int, user models.User) (int, error) {
 
 	return lastInsertedId, nil
 }
+
+func (st *User) DeleteUser(id int) (int, error) {
+	rowsAffected, err := st.u.DeleteUser(id)
+
+	if err != nil {
+		return 0, errors.New("Could not able to delete user for given id")
+	}
+
+	return rowsAffected, nil
+}

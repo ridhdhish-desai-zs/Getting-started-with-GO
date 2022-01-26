@@ -55,7 +55,7 @@ func (u *dbStore) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// PUT /api/users
+// PUT /api/users/{id}
 func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	db := u.db
 
@@ -66,4 +66,19 @@ func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	}
 
 	return id, nil
+}
+
+// DELETE /api/users/{id}
+func (u *dbStore) DeleteUser(id int) (int, error) {
+	db := u.db
+
+	result, err := db.Exec("DELETE FROM user WHERE id = ?", id)
+
+	if err != nil {
+		return 0, errors.New("Could not delete user for given id")
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+
+	return int(rowsAffected), nil
 }

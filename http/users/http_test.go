@@ -171,3 +171,50 @@ func TestUpdateUser(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUserService := services.NewMockUser(ctrl)
+	h := Handler{mockUserService}
+
+	tests := []struct {
+		desc               string
+		id                 string
+		expectedStatusCode int
+		mockCall           *gomock.Call
+	}{
+		{
+			desc:               "Case1",
+			id:                 "1",
+			expectedStatusCode: http.StatusOK,
+			mockCall:           mockUserService.EXPECT().DeleteUser(1).Return(1, nil),
+		},
+		{
+			desc:               "Case2",
+			id:                 "2",
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           mockUserService.EXPECT().DeleteUser(2).Return(0, errors.New("Invalid Id")),
+		},
+		{
+			desc:               "Case3",
+			id:                 "abcd",
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
+	}
+	for _, test := range tests {
+		// Creating test request and response object
+		req := httptest.NewRequest("DELETE", "/api/users/"+test.id, nil)
+		res := httptest.NewRecorder()
+
+		req = mux.SetURLVars(req, map[string]string{
+			"id": test.id,
+		})
+
+		h.DeleteUserHandler(res, req)
+
+		if res.Code != test.expectedStatusCode {
+			t.Errorf("Expected Status Code: %v, Got: %v", test.expectedStatusCode, res.Code)
+		}
+	}
+}

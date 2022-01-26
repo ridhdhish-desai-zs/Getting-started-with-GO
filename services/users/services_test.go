@@ -128,3 +128,41 @@ func TestUpdateUser(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockUserStore := stores.NewMockUser(ctrl)
+	testUserService := New(mockUserStore)
+
+	tests := []struct {
+		desc     string
+		id       int
+		expected int
+		mockCall *gomock.Call
+	}{
+		{
+			desc:     "Case1",
+			id:       1,
+			expected: 1,
+			mockCall: mockUserStore.EXPECT().DeleteUser(1).Return(1, nil),
+		},
+		{
+			desc:     "Case2",
+			id:       2,
+			expected: 0,
+			mockCall: mockUserStore.EXPECT().DeleteUser(2).Return(0, errors.New("Invalid id")),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			rowsAffected, _ := testUserService.DeleteUser(test.id)
+
+			if rowsAffected != test.expected {
+				t.Errorf("Expected: %v, Got: %v", test.expected, rowsAffected)
+			}
+		})
+	}
+}
