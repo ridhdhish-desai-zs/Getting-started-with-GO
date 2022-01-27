@@ -102,11 +102,7 @@ func (u *dbStore) GetUserByEmail(email string) bool {
 	var user models.User
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 
-	if err != nil {
-		return true
-	}
-
-	return false
+	return err != nil
 }
 
 func (u *dbStore) CreateUser(user models.User) (int, error) {

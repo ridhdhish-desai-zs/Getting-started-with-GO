@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"layer/user/models"
 	"layer/user/services"
 	"net/http"
@@ -46,8 +47,8 @@ func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	data, _ := json.Marshal(user)
-	_, _ = res.Write(data)
+	jsonData, _ := json.Marshal(user)
+	_, _ = res.Write([]byte(fmt.Sprintf(`{"data": {"user": %v}}`, string(jsonData))))
 
 }
 
@@ -70,8 +71,9 @@ func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	data, _ := json.Marshal(users)
-	_, _ = res.Write(data)
+	jsonData, _ := json.Marshal(users)
+	_, _ = res.Write([]byte(fmt.Sprintf(`{"data": {"users": %v}}`, string(jsonData))))
+
 }
 
 /*
@@ -120,7 +122,7 @@ func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, _ = res.Write([]byte(`{data: user updated successfully}`))
+	_, _ = res.Write([]byte(`{"data": "user updated successfully"}`))
 }
 
 /*
@@ -156,7 +158,8 @@ func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, _ = res.Write([]byte(`{data: user deleted successfully}`))
+	_, _ = res.Write([]byte(`{"data": "user deleted successfully"}`))
+
 }
 
 /*
@@ -191,5 +194,6 @@ func (h Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, _ = res.Write([]byte(`{data: User created successfully}`))
+	_, _ = res.Write([]byte(`{"data": "user created successfully"}`))
+
 }

@@ -16,9 +16,6 @@ func New(u stores.User) services.User {
 	return &User{u}
 }
 
-// From services we are calling store method (database interaction) which will be in store, and after getting the result we can
-// implement middleware and send the response to http.
-
 func (st *User) GetUserById(id int) (models.User, error) {
 	user, err := st.u.GetUserById(id)
 
