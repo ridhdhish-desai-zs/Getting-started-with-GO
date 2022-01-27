@@ -158,3 +158,38 @@ func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 
 	_, _ = res.Write([]byte(`{data: user deleted successfully}`))
 }
+
+/*
+URL: /api/users
+Method: POST
+Route: Unprotected
+Description: Create new user
+*/
+func (h Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-type", "application/json")
+
+	var user models.User
+
+	err := json.NewDecoder(req.Body).Decode(&user)
+
+	if err != nil || reflect.DeepEqual(user, models.User{}) {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Cannot parse request data"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	_, err = h.S.CreateUser(user)
+	if err != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}
+		jsonData, _ := json.Marshal(newError)
+		_, _ = res.Write(jsonData)
+
+		return
+	}
+
+	_, _ = res.Write([]byte(`{data: User created successfully}`))
+}

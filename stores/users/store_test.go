@@ -168,3 +168,34 @@ func TestDeleteUser(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateUser(t *testing.T) {
+	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer db.Close()
+
+	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+
+	tests := []struct {
+		desc     string
+		expected int
+		mockCall *sqlmock.ExpectedExec
+	}{
+		{desc: "Case1", expected: 1, mockCall: mock.ExpectExec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21).WillReturnResult(sqlmock.NewResult(1, 1))},
+		{desc: "Case2", expected: 0, mockCall: mock.ExpectExec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21).WillReturnError(errors.New("Connection Lost"))},
+	}
+
+	userStore := New(db)
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			user, _ := userStore.CreateUser(testUser)
+
+			if user != test.expected {
+				t.Errorf("Expected: %v, Got: %v", test.expected, user)
+			}
+		})
+	}
+}

@@ -218,3 +218,49 @@ func TestDeleteUser(t *testing.T) {
 		}
 	}
 }
+
+func TestCreateUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	mockUserService := services.NewMockUser(ctrl)
+	h := Handler{mockUserService}
+
+	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+
+	tests := []struct {
+		desc               string
+		user               models.User
+		expectedStatusCode int
+		mockCall           *gomock.Call
+	}{
+		{
+			desc:               "Case1",
+			user:               testUser,
+			expectedStatusCode: http.StatusOK,
+			mockCall:           mockUserService.EXPECT().CreateUser(testUser).Return(1, nil),
+		},
+		{
+			desc:               "Case2",
+			user:               models.User{},
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
+		{
+			desc:               "Case3",
+			user:               testUser,
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           mockUserService.EXPECT().CreateUser(testUser).Return(0, errors.New("Could not create new user")),
+		},
+	}
+	for _, test := range tests {
+		body, _ := json.Marshal(test.user)
+		// Creating test request and response object
+		req := httptest.NewRequest("POST", "/api/users", bytes.NewBuffer(body))
+		res := httptest.NewRecorder()
+
+		h.CreateUserHandler(res, req)
+
+		if res.Code != test.expectedStatusCode {
+			t.Errorf("Expected Status Code: %v, Got: %v", test.expectedStatusCode, res.Code)
+		}
+	}
+}

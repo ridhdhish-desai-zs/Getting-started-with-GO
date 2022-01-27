@@ -27,7 +27,10 @@ func (u *dbStore) GetUserById(id int) (*models.User, error) {
 	}
 
 	var user models.User
-	_ = row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
+	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
+	if err != nil {
+		return nil, errors.New("Invalid Id")
+	}
 
 	return &user, nil
 }
@@ -80,5 +83,42 @@ func (u *dbStore) DeleteUser(id int) (int, error) {
 
 	rowsAffected, _ := result.RowsAffected()
 
+	if rowsAffected == 0 {
+		return 0, errors.New("Could not delete user for given id")
+	}
+
 	return int(rowsAffected), nil
+}
+
+func (u *dbStore) GetUserByEmail(email string) bool {
+	db := u.db
+
+	row := db.QueryRow("SELECT * FROM user WHERE email = ?", email)
+
+	if row.Err() != nil {
+		return true
+	}
+
+	var user models.User
+	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
+
+	if err != nil {
+		return true
+	}
+
+	return false
+}
+
+func (u *dbStore) CreateUser(user models.User) (int, error) {
+	db := u.db
+
+	result, err := db.Exec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)", user.Name, user.Email, user.Phone, user.Age)
+
+	if err != nil {
+		return 0, errors.New("Could not create new user")
+	}
+
+	lastInsertedId, _ := result.LastInsertId()
+
+	return int(lastInsertedId), nil
 }

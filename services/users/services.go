@@ -5,6 +5,7 @@ import (
 	"layer/user/models"
 	"layer/user/services"
 	"layer/user/stores"
+	"reflect"
 )
 
 type User struct {
@@ -56,4 +57,26 @@ func (st *User) DeleteUser(id int) (int, error) {
 	}
 
 	return rowsAffected, nil
+}
+
+func (st *User) CreateUser(user models.User) (int, error) {
+
+	if reflect.DeepEqual(user, models.User{}) {
+		return 0, errors.New("Need user data to create new user")
+	}
+
+	isValid := st.u.GetUserByEmail(user.Email)
+
+	if !isValid {
+		return 0, errors.New("Email id is already in use")
+	}
+
+	lastInsertedId, err := st.u.CreateUser(user)
+
+	if err != nil {
+		return 0, errors.New("Could not able to create new user")
+
+	}
+
+	return lastInsertedId, nil
 }

@@ -33,6 +33,21 @@ func (m *MockUser) EXPECT() *MockUserMockRecorder {
 	return m.recorder
 }
 
+// CreateUser mocks base method
+func (m *MockUser) CreateUser(arg0 models.User) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateUser", arg0)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateUser indicates an expected call of CreateUser
+func (mr *MockUserMockRecorder) CreateUser(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUser)(nil).CreateUser), arg0)
+}
+
 // DeleteUser mocks base method
 func (m *MockUser) DeleteUser(arg0 int) (int, error) {
 	m.ctrl.T.Helper()
@@ -46,6 +61,20 @@ func (m *MockUser) DeleteUser(arg0 int) (int, error) {
 func (mr *MockUserMockRecorder) DeleteUser(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUser)(nil).DeleteUser), arg0)
+}
+
+// GetUserByEmail mocks base method
+func (m *MockUser) GetUserByEmail(arg0 string) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserByEmail", arg0)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// GetUserByEmail indicates an expected call of GetUserByEmail
+func (mr *MockUserMockRecorder) GetUserByEmail(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserByEmail", reflect.TypeOf((*MockUser)(nil).GetUserByEmail), arg0)
 }
 
 // GetUserById mocks base method

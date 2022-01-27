@@ -166,3 +166,54 @@ func TestDeleteUser(t *testing.T) {
 		})
 	}
 }
+
+func TestCreateUser(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockUserStore := stores.NewMockUser(ctrl)
+	testUserService := New(mockUserStore)
+
+	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+
+	tests := []struct {
+		desc     string
+		user     models.User
+		expected int
+		mockCall []*gomock.Call
+	}{
+		{
+			desc:     "Case1",
+			user:     testUser,
+			expected: 1,
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().CreateUser(testUser).Return(1, nil),
+				mockUserStore.EXPECT().GetUserByEmail("ridhdhish@gmail.com").Return(true),
+			},
+		},
+		{
+			desc:     "Case2",
+			user:     testUser,
+			expected: 0,
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().GetUserByEmail("ridhdhish@gmail.com").Return(false),
+			},
+		},
+		{
+			desc:     "Case3",
+			user:     models.User{},
+			expected: 0,
+			mockCall: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			lastInsertedId, _ := testUserService.CreateUser(test.user)
+
+			if lastInsertedId != test.expected {
+				t.Errorf("Expected: %v, Got: %v", test.expected, lastInsertedId)
+			}
+		})
+	}
+}

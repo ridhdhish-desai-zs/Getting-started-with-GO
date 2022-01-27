@@ -7,4 +7,5 @@ type User interface {
 	GetUsers() ([]models.User, error)
 	UpdateUser(id int, user models.User) (int, error)
 	DeleteUser(id int) (int, error)
+	CreateUser(models.User) (int, error)
 }

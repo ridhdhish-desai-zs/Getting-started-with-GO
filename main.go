@@ -28,6 +28,7 @@ func main() {
 	router.Path("/api/users").Methods("GET").HandlerFunc(handler.GetUsersHandler)
 	router.Path("/api/users/{id}").Methods("PUT").HandlerFunc(handler.UpdateUserHandler)
 	router.Path("/api/users/{id}").Methods("DELETE").HandlerFunc(handler.DeleteUserHandler)
+	router.Path("/api/users").Methods("POST").HandlerFunc(handler.CreateUserHandler)
 
 	http.Handle("/", router)
 
