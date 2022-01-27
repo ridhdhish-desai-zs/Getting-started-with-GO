@@ -16,12 +16,6 @@ type Handler struct {
 	S services.User
 }
 
-/*
-URL: /api/users/{id}
-Method: GET
-Route: Unprotected
-Description: Fetch user by it's id
-*/
 func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
@@ -52,12 +46,6 @@ func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) 
 
 }
 
-/*
-URL: /api/users
-Method: GET
-Route: Unprotected
-Description: Fetch all users
-*/
 func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
@@ -76,12 +64,6 @@ func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-/*
-URL: /api/users/{id}
-Method: PUT
-Route: Unprotected
-Description: Update user for given id
-*/
 func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
@@ -125,12 +107,6 @@ func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 	_, _ = res.Write([]byte(`{"data": "user updated successfully"}`))
 }
 
-/*
-URL: /api/users/{id}
-Method: DELETE
-Route: Unprotected
-Description: Delete user for given id
-*/
 func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
@@ -162,12 +138,6 @@ func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-/*
-URL: /api/users
-Method: POST
-Route: Unprotected
-Description: Create new user
-*/
 func (h Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 

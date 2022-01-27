@@ -16,7 +16,10 @@ func New(db *sql.DB) stores.User {
 	return &dbStore{db: db}
 }
 
-// GET /api/users/{id}
+/*
+GET /api/users/{id}
+Fetch user for given id
+*/
 func (u *dbStore) GetUserById(id int) (*models.User, error) {
 	db := u.db
 
@@ -31,7 +34,10 @@ func (u *dbStore) GetUserById(id int) (*models.User, error) {
 	return &user, nil
 }
 
-// GET /api/users
+/*
+GET /api/users
+Fetch all users
+*/
 func (u *dbStore) GetUsers() ([]models.User, error) {
 	db := u.db
 
@@ -54,7 +60,10 @@ func (u *dbStore) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// PUT /api/users/{id}
+/*
+PUT /api/users/{id}
+Update user for given id
+*/
 func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	db := u.db
 
@@ -67,7 +76,10 @@ func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	return id, nil
 }
 
-// DELETE /api/users/{id}
+/*
+DELETE /api/users/{id}
+Delete user for given id
+*/
 func (u *dbStore) DeleteUser(id int) (int, error) {
 	db := u.db
 
@@ -86,6 +98,7 @@ func (u *dbStore) DeleteUser(id int) (int, error) {
 	return int(rowsAffected), nil
 }
 
+// Only used for email validation (email exists or not)
 func (u *dbStore) GetUserByEmail(email string) bool {
 	db := u.db
 
@@ -97,6 +110,10 @@ func (u *dbStore) GetUserByEmail(email string) bool {
 	return err != nil
 }
 
+/*
+POST /api/users
+Creating new user
+*/
 func (u *dbStore) CreateUser(user models.User) (int, error) {
 	db := u.db
 
