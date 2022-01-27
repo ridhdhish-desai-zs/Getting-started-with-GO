@@ -205,6 +205,15 @@ func TestCreateUser(t *testing.T) {
 			expected: 0,
 			mockCall: nil,
 		},
+		{
+			desc:     "Case4",
+			user:     testUser,
+			expected: 0,
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().CreateUser(testUser).Return(0, errors.New("Could not able to create new user")),
+				mockUserStore.EXPECT().GetUserByEmail("ridhdhish@gmail.com").Return(true),
+			},
+		},
 	}
 
 	for _, test := range tests {

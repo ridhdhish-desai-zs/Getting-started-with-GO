@@ -72,7 +72,6 @@ func (st *User) CreateUser(user models.User) (int, error) {
 
 	if err != nil {
 		return 0, errors.New("Could not able to create new user")
-
 	}
 
 	return lastInsertedId, nil
