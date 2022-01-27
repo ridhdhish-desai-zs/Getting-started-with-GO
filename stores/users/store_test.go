@@ -2,7 +2,6 @@ package users
 
 import (
 	"errors"
-	"fmt"
 	"layer/user/models"
 	"reflect"
 	"testing"
@@ -11,10 +10,7 @@ import (
 )
 
 func TestGetById(t *testing.T) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		fmt.Println(err)
-	}
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	defer db.Close()
 
 	rows := sqlmock.NewRows([]string{"id", "name", "email", "phone", "age"}).AddRow(
@@ -45,10 +41,8 @@ func TestGetById(t *testing.T) {
 }
 
 func TestGetUsers(t *testing.T) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		fmt.Println(err)
-	}
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+
 	defer db.Close()
 
 	rows := sqlmock.NewRows([]string{"id", "name", "email", "phone", "age"}).AddRow(
@@ -91,10 +85,8 @@ func TestGetUsers(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		fmt.Println(err)
-	}
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+
 	defer db.Close()
 
 	tests := []struct {
@@ -130,10 +122,7 @@ func TestUpdateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		fmt.Println(err)
-	}
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	defer db.Close()
 
 	tests := []struct {
@@ -170,10 +159,7 @@ func TestDeleteUser(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
-	if err != nil {
-		fmt.Println(err)
-	}
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
 	defer db.Close()
 
 	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}

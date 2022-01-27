@@ -3,7 +3,6 @@ package users
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"layer/user/models"
 	"layer/user/stores"
@@ -25,7 +24,6 @@ func (u *dbStore) GetUserById(id int) (*models.User, error) {
 
 	var user models.User
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
-	fmt.Println(err)
 	if err != nil {
 		return nil, errors.New("Invalid Id")
 	}
