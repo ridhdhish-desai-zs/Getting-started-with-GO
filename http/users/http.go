@@ -13,10 +13,14 @@ import (
 )
 
 type Handler struct {
-	S services.User
+	hndlr services.User
 }
 
-func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) {
+func New(s services.User) Handler {
+	return Handler{s}
+}
+
+func (srv Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	params := mux.Vars(req)
@@ -32,7 +36,7 @@ func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	user, err := h.S.GetUserById(id)
+	user, err := srv.hndlr.GetUserById(id)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. User id not found"}
@@ -46,10 +50,10 @@ func (h Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request) 
 
 }
 
-func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
+func (srv Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
-	users, err := h.S.GetUsers()
+	users, err := srv.hndlr.GetUsers()
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Could not fetch users"}
@@ -64,7 +68,7 @@ func (h Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
+func (srv Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	var user models.User
@@ -93,7 +97,7 @@ func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err = h.S.UpdateUser(convId, user)
+	_, err = srv.hndlr.UpdateUser(convId, user)
 
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
@@ -107,7 +111,7 @@ func (h Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 	_, _ = res.Write([]byte(`{"data": "user updated successfully"}`))
 }
 
-func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
+func (srv Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	params := mux.Vars(req)
@@ -123,7 +127,7 @@ func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err = h.S.DeleteUser(convId)
+	_, err = srv.hndlr.DeleteUser(convId)
 
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
@@ -138,7 +142,7 @@ func (h Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
-func (h Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request) {
+func (srv Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
 	var user models.User
@@ -154,7 +158,7 @@ func (h Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	_, err = h.S.CreateUser(user)
+	_, err = srv.hndlr.CreateUser(user)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}

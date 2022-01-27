@@ -21,7 +21,8 @@ func main() {
 
 	st := userstore.New(db)
 	sr := userServices.New(st)
-	handler := userHttp.Handler{S: sr}
+	// handler := userHttp.Handler{S: sr}
+	handler := userHttp.New(sr)
 
 	router := mux.NewRouter()
 	router.Path("/api/users/{id}").Methods("GET").HandlerFunc(handler.GetUserByIdHandler)
