@@ -143,6 +143,12 @@ func TestDeleteUser(t *testing.T) {
 			expected: 0,
 			mockCall: mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnError(errors.New("Invalid Id")),
 		},
+		{
+			desc:     "Case3",
+			id:       2,
+			expected: 0,
+			mockCall: mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnResult(sqlmock.NewResult(0, 0)),
+		},
 	}
 
 	userStore := New(db)
@@ -169,8 +175,16 @@ func TestCreateUser(t *testing.T) {
 		expected int
 		mockCall *sqlmock.ExpectedExec
 	}{
-		{desc: "Case1", expected: 1, mockCall: mock.ExpectExec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21).WillReturnResult(sqlmock.NewResult(1, 1))},
-		{desc: "Case2", expected: 0, mockCall: mock.ExpectExec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21).WillReturnError(errors.New("Connection Lost"))},
+		{
+			desc:     "Case1",
+			expected: 1,
+			mockCall: mock.ExpectExec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21).WillReturnResult(sqlmock.NewResult(1, 1)),
+		},
+		{
+			desc:     "Case2",
+			expected: 0,
+			mockCall: mock.ExpectExec("INSERT INTO user(name, email, phone, age) VALUES(?, ?, ?, ?)").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21).WillReturnError(errors.New("Email Id already exist")),
+		},
 	}
 
 	userStore := New(db)
@@ -181,6 +195,47 @@ func TestCreateUser(t *testing.T) {
 
 			if user != test.expected {
 				t.Errorf("Expected: %v, Got: %v", test.expected, user)
+			}
+		})
+	}
+}
+
+func TestGetUserByEmail(t *testing.T) {
+	db, mock, _ := sqlmock.New(sqlmock.QueryMatcherOption(sqlmock.QueryMatcherEqual))
+	defer db.Close()
+
+	rows := sqlmock.NewRows([]string{"id", "name", "email", "phone", "age"}).AddRow(
+		1, "Naruto", "ridhdhish@gmail.com", "9999999999", 21,
+	)
+
+	tests := []struct {
+		desc     string
+		email    string
+		expected bool
+		mockCall *sqlmock.ExpectedQuery
+	}{
+		{
+			desc:     "Case1",
+			email:    "ridhdhish@gmail.com",
+			expected: false,
+			mockCall: mock.ExpectQuery("SELECT * FROM user WHERE email = ?").WithArgs("ridhdhish@gmail.com").WillReturnRows(rows),
+		},
+		{
+			desc:     "Case2",
+			email:    "naruto@gmail.com",
+			expected: true,
+			mockCall: mock.ExpectQuery("SELECT * FROM user WHERE email = ?").WithArgs("naruto@gmail.com").WillReturnError(errors.New("Email is already in use")),
+		},
+	}
+
+	userStore := New(db)
+
+	for _, test := range tests {
+		t.Run(test.desc, func(t *testing.T) {
+			isValid := userStore.GetUserByEmail(test.email)
+
+			if isValid != test.expected {
+				t.Errorf("Expected: %v, Got: %v", test.expected, isValid)
 			}
 		})
 	}

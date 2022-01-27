@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	db, err := driver.ConnectToMySql()
+	db, err := driver.ConnectToMySql("mysql")
 
 	if err != nil {
 		// TODO: Handle error

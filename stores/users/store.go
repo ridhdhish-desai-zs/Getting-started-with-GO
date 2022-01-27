@@ -91,10 +91,6 @@ func (u *dbStore) GetUserByEmail(email string) bool {
 
 	row := db.QueryRow("SELECT * FROM user WHERE email = ?", email)
 
-	if row.Err() != nil {
-		return true
-	}
-
 	var user models.User
 	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
 
