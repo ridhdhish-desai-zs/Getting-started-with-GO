@@ -214,6 +214,18 @@ func TestCreateUser(t *testing.T) {
 				mockUserStore.EXPECT().GetUserByEmail("ridhdhish@gmail.com").Return(true),
 			},
 		},
+		{
+			desc:     "Case5",
+			user:     models.User{Name: "Ridhdhish", Email: "ridhdhish", Phone: "8320578360", Age: 21},
+			expected: 0,
+			mockCall: nil,
+		},
+		{
+			desc:     "Case5",
+			user:     models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "796889", Age: 21},
+			expected: 0,
+			mockCall: nil,
+		},
 	}
 
 	for _, test := range tests {

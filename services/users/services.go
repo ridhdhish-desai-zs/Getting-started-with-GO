@@ -62,6 +62,18 @@ func (st *User) CreateUser(user models.User) (int, error) {
 		return 0, errors.New("Need user data to create new user")
 	}
 
+	validEmail := validateEmail(user.Email)
+
+	if !validEmail {
+		return 0, errors.New("Invalid email address")
+	}
+
+	validPhone := validatePhone(user.Phone)
+
+	if !validPhone {
+		return 0, errors.New("Invalid phone number")
+	}
+
 	isValid := st.u.GetUserByEmail(user.Email)
 
 	if !isValid {
