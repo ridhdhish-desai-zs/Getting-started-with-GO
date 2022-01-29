@@ -36,6 +36,14 @@ func (srv Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request
 		return
 	}
 
+	if id <= 0 {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Id should be greater than 0"}
+		err, _ := json.Marshal(newError)
+		_, _ = res.Write(err)
+		return
+	}
+
 	user, err := srv.hndlr.GetUserById(id)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
@@ -68,6 +76,7 @@ func (srv Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 
 }
 
+// TODO: User should be able to update any number of data
 func (srv Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
@@ -94,6 +103,14 @@ func (srv Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request)
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 
+		return
+	}
+
+	if convId <= 0 {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Id should be greater than 0"}
+		err, _ := json.Marshal(newError)
+		_, _ = res.Write(err)
 		return
 	}
 
@@ -124,6 +141,14 @@ func (srv Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request)
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 
+		return
+	}
+
+	if convId <= 0 {
+		res.WriteHeader(http.StatusBadRequest)
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Id should be greater than 0"}
+		err, _ := json.Marshal(newError)
+		_, _ = res.Write(err)
 		return
 	}
 

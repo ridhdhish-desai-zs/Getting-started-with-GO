@@ -21,7 +21,7 @@ Test for Fetch User by Id
 func TestUserById(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserService := services.NewMockUser(ctrl)
-	h := Handler{mockUserService}
+	h := New(mockUserService)
 
 	testUser := models.User{Id: 1, Name: "Naruto", Email: "naruto@japan.com", Phone: "9999999999", Age: 180}
 
@@ -49,6 +49,12 @@ func TestUserById(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			mockCall:           nil,
 		},
+		{
+			desc:               "Case4",
+			id:                 "-1",
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -71,7 +77,7 @@ func TestUserById(t *testing.T) {
 func TestGetUsersHandler(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserService := services.NewMockUser(ctrl)
-	h := Handler{mockUserService}
+	h := New(mockUserService)
 
 	data1 := []models.User{
 		{Id: 1, Name: "Naruto", Email: "naruto@gmail.com", Phone: "9999999999", Age: 18},
@@ -111,7 +117,7 @@ func TestGetUsersHandler(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserService := services.NewMockUser(ctrl)
-	h := Handler{mockUserService}
+	h := New(mockUserService)
 
 	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
 
@@ -150,6 +156,13 @@ func TestUpdateUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			mockCall:           nil,
 		},
+		{
+			desc:               "Case5",
+			id:                 "-1",
+			body:               testUser,
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
 	}
 
 	for _, test := range tests {
@@ -175,7 +188,7 @@ func TestUpdateUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserService := services.NewMockUser(ctrl)
-	h := Handler{mockUserService}
+	h := New(mockUserService)
 
 	tests := []struct {
 		desc               string
@@ -201,6 +214,12 @@ func TestDeleteUser(t *testing.T) {
 			expectedStatusCode: http.StatusBadRequest,
 			mockCall:           nil,
 		},
+		{
+			desc:               "Case4",
+			id:                 "-1",
+			expectedStatusCode: http.StatusBadRequest,
+			mockCall:           nil,
+		},
 	}
 	for _, test := range tests {
 		// Creating test request and response object
@@ -222,7 +241,7 @@ func TestDeleteUser(t *testing.T) {
 func TestCreateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockUserService := services.NewMockUser(ctrl)
-	h := Handler{mockUserService}
+	h := New(mockUserService)
 
 	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
 
