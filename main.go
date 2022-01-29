@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"layer/user/driver"
 	userHttp "layer/user/http/users"
+	"layer/user/middlewares/auth"
 	userServices "layer/user/services/users"
 	userstore "layer/user/stores/users"
 	"net/http"
@@ -25,10 +26,19 @@ func main() {
 	handler := userHttp.New(sr)
 
 	router := mux.NewRouter()
-	router.Path("/api/users/{id}").Methods("GET").HandlerFunc(handler.GetUserByIdHandler)
-	router.Path("/api/users").Methods("GET").HandlerFunc(handler.GetUsersHandler)
-	router.Path("/api/users/{id}").Methods("PUT").HandlerFunc(handler.UpdateUserHandler)
-	router.Path("/api/users/{id}").Methods("DELETE").HandlerFunc(handler.DeleteUserHandler)
+	router.Path("/api/users/{id}").Methods("GET").Handler(func() http.Handler {
+		return auth.ValidateEmail(http.HandlerFunc(handler.GetUserByIdHandler))
+	}())
+
+	router.Path("/api/users").Methods("GET").Handler(func() http.Handler {
+		return auth.ValidateEmail(http.HandlerFunc(handler.GetUsersHandler))
+	}())
+	router.Path("/api/users/{id}").Methods("PUT").Handler(func() http.Handler {
+		return auth.ValidateEmail(http.HandlerFunc(handler.UpdateUserHandler))
+	}())
+	router.Path("/api/users/{id}").Methods("DELETE").Handler(func() http.Handler {
+		return auth.ValidateEmail(http.HandlerFunc(handler.DeleteUserHandler))
+	}())
 	router.Path("/api/users").Methods("POST").HandlerFunc(handler.CreateUserHandler)
 
 	http.Handle("/", router)
