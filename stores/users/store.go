@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 
@@ -66,12 +67,47 @@ Update user for given id
 */
 func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	db := u.db
+	var err error
 
-	_, err := db.Exec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?", user.Name, user.Email, user.Phone, user.Age, id)
+	ctx := context.Background()
 
-	if err != nil {
-		return 0, errors.New("Could not update user for given id")
+	tx, _ := db.BeginTx(ctx, nil)
+
+	if user.Name != "" {
+		_, err = tx.ExecContext(ctx, "UPDATE user SET name = ? WHERE id = ?", user.Name, id)
+		if err != nil {
+			_ = tx.Rollback()
+			return 0, errors.New("Internal server error")
+		}
 	}
+
+	if user.Email != "" {
+		_, err = tx.ExecContext(ctx, "UPDATE user SET email = ? WHERE id = ?", user.Email, id)
+		if err != nil {
+			_ = tx.Rollback()
+			return 0, errors.New("Internal server error")
+		}
+	}
+
+	if user.Age != 0 {
+		_, err = tx.ExecContext(ctx, "UPDATE user SET age = ? WHERE id = ?", user.Age, id)
+		if err != nil {
+			_ = tx.Rollback()
+			return 0, errors.New("Internal server error")
+		}
+	}
+
+	if user.Phone != "" {
+		_, err = tx.ExecContext(ctx, "UPDATE user SET phone = ? WHERE id = ?", user.Phone, id)
+		if err != nil {
+			_ = tx.Rollback()
+			return 0, errors.New("Internal server error")
+		}
+	}
+
+	// _, err = db.Exec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?", user.Name, user.Email, user.Phone, user.Age, id)
+
+	_ = tx.Commit()
 
 	return id, nil
 }
