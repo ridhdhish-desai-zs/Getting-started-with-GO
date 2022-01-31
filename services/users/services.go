@@ -36,6 +36,7 @@ func (st *User) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
+// TODO: Call getUserById() and return that user
 func (st *User) UpdateUser(id int, user models.User) (int, error) {
 	lastInsertedId, err := st.u.UpdateUser(id, user)
 
@@ -46,16 +47,17 @@ func (st *User) UpdateUser(id int, user models.User) (int, error) {
 	return lastInsertedId, nil
 }
 
-func (st *User) DeleteUser(id int) (int, error) {
-	rowsAffected, err := st.u.DeleteUser(id)
+func (st *User) DeleteUser(id int) error {
+	err := st.u.DeleteUser(id)
 
 	if err != nil {
-		return 0, errors.New("Could not able to delete user for given id")
+		return errors.New("Could not able to delete user for given id")
 	}
 
-	return rowsAffected, nil
+	return nil
 }
 
+// TODO: Call getUserById and return the user object
 func (st *User) CreateUser(user models.User) (int, error) {
 
 	if reflect.DeepEqual(user, models.User{}) {

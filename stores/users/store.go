@@ -61,6 +61,7 @@ func (u *dbStore) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
+// TODO: use looping to create query string. This is waste of time
 /*
 PUT /api/users/{id}
 Update user for given id
@@ -116,32 +117,32 @@ func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 DELETE /api/users/{id}
 Delete user for given id
 */
-func (u *dbStore) DeleteUser(id int) (int, error) {
+func (u *dbStore) DeleteUser(id int) error {
 	db := u.db
 
 	result, err := db.Exec("DELETE FROM user WHERE id = ?", id)
 
 	if err != nil {
-		return 0, errors.New("Could not delete user for given id")
+		return errors.New("Could not delete user for given id")
 	}
 
 	rowsAffected, _ := result.RowsAffected()
 
 	if rowsAffected == 0 {
-		return 0, errors.New("Could not delete user for given id")
+		return errors.New("Could not delete user for given id")
 	}
 
-	return int(rowsAffected), nil
+	return nil
 }
 
 // Only used for email validation (email exists or not)
 func (u *dbStore) GetUserByEmail(email string) bool {
 	db := u.db
 
-	row := db.QueryRow("SELECT * FROM user WHERE email = ?", email)
+	row := db.QueryRow("SELECT id FROM user WHERE email = ?", email)
 
 	var user models.User
-	err := row.Scan(&user.Id, &user.Name, &user.Email, &user.Phone, &user.Age)
+	err := row.Scan(&user.Id)
 
 	return err != nil
 }

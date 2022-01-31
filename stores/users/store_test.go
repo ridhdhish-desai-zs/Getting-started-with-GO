@@ -189,28 +189,28 @@ func TestDeleteUser(t *testing.T) {
 	defer db.Close()
 
 	tests := []struct {
-		desc     string
-		id       int
-		expected int
-		mockCall *sqlmock.ExpectedExec
+		desc          string
+		id            int
+		expectedError error
+		mockCall      *sqlmock.ExpectedExec
 	}{
 		{
-			desc:     "Case1",
-			id:       1,
-			expected: 1,
-			mockCall: mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1)),
+			desc:          "Case1",
+			id:            1,
+			expectedError: nil,
+			mockCall:      mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(1).WillReturnResult(sqlmock.NewResult(1, 1)),
 		},
 		{
-			desc:     "Case2",
-			id:       2,
-			expected: 0,
-			mockCall: mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnError(errors.New("Invalid Id")),
+			desc:          "Case2",
+			id:            2,
+			expectedError: errors.New("Could not delete user for given id"),
+			mockCall:      mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnError(errors.New("Could not delete user for given id")),
 		},
 		{
-			desc:     "Case3",
-			id:       2,
-			expected: 0,
-			mockCall: mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnResult(sqlmock.NewResult(0, 0)),
+			desc:          "Case3",
+			id:            2,
+			expectedError: errors.New("Could not delete user for given id"),
+			mockCall:      mock.ExpectExec("DELETE FROM user WHERE id = ?").WithArgs(2).WillReturnResult(sqlmock.NewResult(0, 0)),
 		},
 	}
 
@@ -218,10 +218,10 @@ func TestDeleteUser(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			affectedRows, _ := userStore.DeleteUser(test.id)
+			err := userStore.DeleteUser(test.id)
 
-			if affectedRows != test.expected {
-				t.Errorf("Expected: %d, Got: %d", test.expected, affectedRows)
+			if test.expectedError != nil && errors.Is(err, test.expectedError) {
+				t.Errorf("Expected: %v, Got: %v", test.expectedError.Error(), err.Error())
 			}
 		})
 	}

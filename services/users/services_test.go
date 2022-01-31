@@ -137,31 +137,31 @@ func TestDeleteUser(t *testing.T) {
 	testUserService := New(mockUserStore)
 
 	tests := []struct {
-		desc     string
-		id       int
-		expected int
-		mockCall *gomock.Call
+		desc          string
+		id            int
+		expectedError error
+		mockCall      *gomock.Call
 	}{
 		{
-			desc:     "Case1",
-			id:       1,
-			expected: 1,
-			mockCall: mockUserStore.EXPECT().DeleteUser(1).Return(1, nil),
+			desc:          "Case1",
+			id:            1,
+			expectedError: nil,
+			mockCall:      mockUserStore.EXPECT().DeleteUser(1).Return(nil),
 		},
 		{
-			desc:     "Case2",
-			id:       2,
-			expected: 0,
-			mockCall: mockUserStore.EXPECT().DeleteUser(2).Return(0, errors.New("Invalid id")),
+			desc:          "Case2",
+			id:            2,
+			expectedError: errors.New("Could not able to delete user for given id"),
+			mockCall:      mockUserStore.EXPECT().DeleteUser(2).Return(errors.New("Could not able to delete user for given id")),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
-			rowsAffected, _ := testUserService.DeleteUser(test.id)
+			err := testUserService.DeleteUser(test.id)
 
-			if rowsAffected != test.expected {
-				t.Errorf("Expected: %v, Got: %v", test.expected, rowsAffected)
+			if err != nil && errors.Is(err, test.expectedError) {
+				t.Errorf("Expected: %v, Got: %v", test.expectedError, err)
 			}
 		})
 	}

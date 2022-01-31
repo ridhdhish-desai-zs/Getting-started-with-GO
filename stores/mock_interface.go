@@ -49,12 +49,11 @@ func (mr *MockUserMockRecorder) CreateUser(arg0 interface{}) *gomock.Call {
 }
 
 // DeleteUser mocks base method
-func (m *MockUser) DeleteUser(arg0 int) (int, error) {
+func (m *MockUser) DeleteUser(arg0 int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUser", arg0)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // DeleteUser indicates an expected call of DeleteUser

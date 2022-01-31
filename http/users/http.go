@@ -152,7 +152,7 @@ func (srv Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	_, err = srv.hndlr.DeleteUser(convId)
+	err = srv.hndlr.DeleteUser(convId)
 
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
