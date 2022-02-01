@@ -93,11 +93,8 @@ func TestUpdateUser(t *testing.T) {
 		desc       string
 		id         int
 		user       models.User
-		expected   int
-		beginTx    *sqlmock.ExpectedBegin
+		expectedId int
 		mockCall   []*sqlmock.ExpectedExec
-		commitTx   *sqlmock.ExpectedCommit
-		rollbackTx *sqlmock.ExpectedRollback
 	}{
 		{
 			desc: "Case1",
@@ -108,65 +105,46 @@ func TestUpdateUser(t *testing.T) {
 				Phone: "8320578360",
 				Age:   21,
 			},
-			expected: 1,
-			beginTx:  mock.ExpectBegin(),
-			// mockCall: mock.ExpectExec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?").WithArgs("Ridhdhish", "ridhdhish@gmail.com", "8320578360", 21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
+			expectedId: 1,
 			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET name = ? WHERE id = ?").WithArgs("Ridhdhish", 1).WillReturnResult(sqlmock.NewResult(1, 1)),
-				mock.ExpectExec("UPDATE user SET email = ? WHERE id = ?").WithArgs("rid@gmail.com", 1).WillReturnResult(sqlmock.NewResult(1, 1)),
-				mock.ExpectExec("UPDATE user SET age = ? WHERE id = ?").WithArgs(21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
-				mock.ExpectExec("UPDATE user SET phone = ? WHERE id = ?").WithArgs("8320578360", 1).WillReturnResult(sqlmock.NewResult(1, 1)),
+				mock.ExpectExec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?").WithArgs("Ridhdhish", "rid@gmail.com", "8320578360", 21, 1).WillReturnResult(sqlmock.NewResult(1, 1)),
 			},
-			commitTx:   mock.ExpectCommit(),
-			rollbackTx: nil,
 		},
 		{
-			desc:     "Case2",
-			id:       2,
-			user:     models.User{Age: 21},
-			expected: 0,
-			beginTx:  mock.ExpectBegin(),
-			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET age = ? WHERE id = ?").WithArgs(21, 2).WillReturnError(errors.New("Invalid Id")),
-			},
-			commitTx:   nil,
-			rollbackTx: mock.ExpectRollback(),
+			desc:       "Case2",
+			id:         2,
+			user:       models.User{},
+			expectedId: -1,
+			mockCall:   nil,
 		},
 		{
-			desc:     "Case3",
-			id:       2,
-			user:     models.User{Phone: "8320578360"},
-			expected: 0,
-			beginTx:  mock.ExpectBegin(),
-			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET phone = ? WHERE id = ?").WithArgs("8320578360", 2).WillReturnError(errors.New("Invalid Id")),
-			},
-			commitTx:   nil,
-			rollbackTx: mock.ExpectRollback(),
+			desc:       "Case3",
+			id:         -1,
+			user:       models.User{},
+			expectedId: -1,
+			mockCall:   nil,
 		},
 		{
-			desc:     "Case4",
-			id:       2,
-			user:     models.User{Email: "rid@gmail.com"},
-			expected: 0,
-			beginTx:  mock.ExpectBegin(),
-			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET email = ? WHERE id = ?").WithArgs("rid@gmail.com", 2).WillReturnError(errors.New("Invalid Id")),
+			desc: "Case4",
+			id:   1,
+			user: models.User{
+				Name: "Ridhdhish",
 			},
-			commitTx:   nil,
-			rollbackTx: mock.ExpectRollback(),
+			expectedId: -1,
+			mockCall: []*sqlmock.ExpectedExec{
+				mock.ExpectExec("UPDATE user SET name = ?, WHERE id = ?").WithArgs("Ridhdhish", 1).WillReturnError(errors.New("Connection lost")),
+			},
 		},
 		{
-			desc:     "Case5",
-			id:       2,
-			user:     models.User{Name: "Ridhdhish"},
-			expected: 0,
-			beginTx:  mock.ExpectBegin(),
-			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET name = ? WHERE id = ?").WithArgs("Ridhdhish", 2).WillReturnError(errors.New("Invalid Id")),
+			desc: "Case5",
+			id:   2,
+			user: models.User{
+				Name: "Ridhdhish",
 			},
-			commitTx:   nil,
-			rollbackTx: mock.ExpectRollback(),
+			expectedId: -1,
+			mockCall: []*sqlmock.ExpectedExec{
+				mock.ExpectExec("UPDATE user SET name = ?, WHERE id = ?").WithArgs("Ridhdhish", 2).WillReturnResult(sqlmock.NewResult(0, 0)),
+			},
 		},
 	}
 	userStore := New(db)
@@ -174,10 +152,10 @@ func TestUpdateUser(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.desc, func(t *testing.T) {
 			// mock.ExpectBegin()
-			affectedRows, _ := userStore.UpdateUser(test.id, test.user)
+			updatedUserId, _ := userStore.UpdateUser(test.id, test.user)
 
-			if affectedRows != test.expected {
-				t.Errorf("Expected: %d, Got: %d", test.expected, affectedRows)
+			if updatedUserId != test.expectedId {
+				t.Errorf("Expected: %d, Got: %d", test.expectedId, updatedUserId)
 			}
 			// mock.ExpectCommit()
 		})

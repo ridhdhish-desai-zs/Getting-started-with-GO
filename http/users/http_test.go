@@ -120,6 +120,7 @@ func TestUpdateUser(t *testing.T) {
 	h := New(mockUserService)
 
 	testUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
+	updatedUser := models.User{Name: "Ridhdhish", Email: "ridhdhish@gmail.com", Phone: "8320578360", Age: 21}
 
 	tests := []struct {
 		desc               string
@@ -133,14 +134,14 @@ func TestUpdateUser(t *testing.T) {
 			id:                 "1",
 			body:               testUser,
 			expectedStatusCode: http.StatusOK,
-			mockCall:           mockUserService.EXPECT().UpdateUser(1, testUser).Return(1, nil),
+			mockCall:           mockUserService.EXPECT().UpdateUser(1, testUser).Return(&updatedUser, nil),
 		},
 		{
 			desc:               "Case2",
 			id:                 "2",
 			body:               testUser,
 			expectedStatusCode: http.StatusBadRequest,
-			mockCall:           mockUserService.EXPECT().UpdateUser(2, testUser).Return(0, errors.New("Invalid Id")),
+			mockCall:           mockUserService.EXPECT().UpdateUser(2, testUser).Return(&models.User{}, errors.New("Invalid Id")),
 		},
 		{
 			desc:               "Case3",
@@ -255,7 +256,7 @@ func TestCreateUser(t *testing.T) {
 			desc:               "Case1",
 			user:               testUser,
 			expectedStatusCode: http.StatusOK,
-			mockCall:           mockUserService.EXPECT().CreateUser(testUser).Return(1, nil),
+			mockCall:           mockUserService.EXPECT().CreateUser(testUser).Return(&testUser, nil),
 		},
 		{
 			desc:               "Case2",
@@ -267,7 +268,7 @@ func TestCreateUser(t *testing.T) {
 			desc:               "Case3",
 			user:               testUser,
 			expectedStatusCode: http.StatusBadRequest,
-			mockCall:           mockUserService.EXPECT().CreateUser(testUser).Return(0, errors.New("Could not create new user")),
+			mockCall:           mockUserService.EXPECT().CreateUser(testUser).Return(&models.User{}, errors.New("Could not create new user")),
 		},
 	}
 	for _, test := range tests {

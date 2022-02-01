@@ -37,14 +37,16 @@ func (st *User) GetUsers() ([]models.User, error) {
 }
 
 // TODO: Call getUserById() and return that user
-func (st *User) UpdateUser(id int, user models.User) (int, error) {
-	lastInsertedId, err := st.u.UpdateUser(id, user)
+func (st *User) UpdateUser(id int, user models.User) (*models.User, error) {
+	_, err := st.u.UpdateUser(id, user)
 
 	if err != nil {
-		return 0, errors.New("Could not able to update user for given id")
+		return nil, err
 	}
 
-	return lastInsertedId, nil
+	updatedUser, _ := st.GetUserById(id)
+
+	return &updatedUser, nil
 }
 
 func (st *User) DeleteUser(id int) error {
@@ -57,36 +59,37 @@ func (st *User) DeleteUser(id int) error {
 	return nil
 }
 
-// TODO: Call getUserById and return the user object
-func (st *User) CreateUser(user models.User) (int, error) {
+func (st *User) CreateUser(user models.User) (*models.User, error) {
 
 	if reflect.DeepEqual(user, models.User{}) {
-		return 0, errors.New("Need user data to create new user")
+		return nil, errors.New("Need user data to create new user")
 	}
 
 	validEmail := validateEmail(user.Email)
 
 	if !validEmail {
-		return 0, errors.New("Invalid email address")
+		return nil, errors.New("Invalid email address")
 	}
 
 	validPhone := validatePhone(user.Phone)
 
 	if !validPhone {
-		return 0, errors.New("Invalid phone number")
+		return nil, errors.New("Invalid phone number")
 	}
 
 	isValid := st.u.GetUserByEmail(user.Email)
 
 	if !isValid {
-		return 0, errors.New("Email id is already in use")
+		return nil, errors.New("Email id is already in exist")
 	}
 
 	lastInsertedId, err := st.u.CreateUser(user)
 
 	if err != nil {
-		return 0, errors.New("Could not able to create new user")
+		return nil, errors.New("Could not able to create new user")
 	}
 
-	return lastInsertedId, nil
+	updatedUser, _ := st.GetUserById(lastInsertedId)
+
+	return &updatedUser, nil
 }

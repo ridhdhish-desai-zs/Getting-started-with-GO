@@ -1,7 +1,6 @@
 package users
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
@@ -61,56 +60,38 @@ func (u *dbStore) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// TODO: use looping to create query string. This is waste of time
 /*
 PUT /api/users/{id}
 Update user for given id
 */
 func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	db := u.db
-	var err error
 
-	ctx := context.Background()
-
-	tx, _ := db.BeginTx(ctx, nil)
-
-	if user.Name != "" {
-		_, err = tx.ExecContext(ctx, "UPDATE user SET name = ? WHERE id = ?", user.Name, id)
-		if err != nil {
-			_ = tx.Rollback()
-			return 0, errors.New("Internal server error")
-		}
+	if id < 0 {
+		return -1, errors.New("User id must be greater than 0")
 	}
 
-	if user.Email != "" {
-		_, err = tx.ExecContext(ctx, "UPDATE user SET email = ? WHERE id = ?", user.Email, id)
+	queryString := "UPDATE user"
+
+	fields, args := formUpdateQuery(id, user)
+
+	if fields != "" {
+		queryString += " SET" + fields + " WHERE id = ?"
+		result, err := db.Exec(queryString, args...)
+
 		if err != nil {
-			_ = tx.Rollback()
-			return 0, errors.New("Internal server error")
+			return -1, errors.New("Internal server error")
 		}
+
+		rows, _ := result.RowsAffected()
+		if rows == 0 {
+			return -1, errors.New("Invalid user id")
+		}
+
+		return id, nil
 	}
 
-	if user.Age != 0 {
-		_, err = tx.ExecContext(ctx, "UPDATE user SET age = ? WHERE id = ?", user.Age, id)
-		if err != nil {
-			_ = tx.Rollback()
-			return 0, errors.New("Internal server error")
-		}
-	}
-
-	if user.Phone != "" {
-		_, err = tx.ExecContext(ctx, "UPDATE user SET phone = ? WHERE id = ?", user.Phone, id)
-		if err != nil {
-			_ = tx.Rollback()
-			return 0, errors.New("Internal server error")
-		}
-	}
-
-	// _, err = db.Exec("UPDATE user SET name = ?, email = ?, phone = ?, age = ? WHERE id = ?", user.Name, user.Email, user.Phone, user.Age, id)
-
-	_ = tx.Commit()
-
-	return id, nil
+	return -1, errors.New("Nothing to update. Provide user data to update the user")
 }
 
 /*

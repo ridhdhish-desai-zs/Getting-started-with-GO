@@ -71,12 +71,17 @@ func (srv Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	jsonData, _ := json.Marshal(users)
-	_, _ = res.Write([]byte(fmt.Sprintf(`{"data": {"users": %v}}`, string(jsonData))))
+	responseData := models.Response{
+		Data:       users,
+		StatusCode: 200,
+		Message:    "Successful operation",
+	}
+
+	jsonData, _ := json.Marshal(responseData)
+	_, _ = res.Write([]byte(string(jsonData)))
 
 }
 
-// TODO: User should be able to update any number of data
 func (srv Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-type", "application/json")
 
@@ -114,18 +119,26 @@ func (srv Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	_, err = srv.hndlr.UpdateUser(convId, user)
+	updatedUser, err := srv.hndlr.UpdateUser(convId, user)
 
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: err.Error()}
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 
 		return
 	}
 
-	_, _ = res.Write([]byte(`{"data": "user updated successfully"}`))
+	responseData := models.Response{
+		Data:       updatedUser,
+		StatusCode: 201,
+		Message:    "User updated Successfully",
+	}
+
+	jsonData, _ := json.Marshal(responseData)
+
+	_, _ = res.Write(jsonData)
 }
 
 func (srv Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request) {
@@ -183,16 +196,24 @@ func (srv Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	_, err = srv.hndlr.CreateUser(user)
+	createdUser, err := srv.hndlr.CreateUser(user)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
-		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: "Bad Request. Something went wrong"}
+		newError := models.ErrorResponse{StatusCode: http.StatusBadRequest, ErrorMessage: err.Error()}
 		jsonData, _ := json.Marshal(newError)
 		_, _ = res.Write(jsonData)
 
 		return
 	}
 
-	_, _ = res.Write([]byte(`{"data": "user created successfully"}`))
+	responseData := models.Response{
+		Data:       createdUser,
+		Message:    "User created successfully",
+		StatusCode: 201,
+	}
+
+	jsonData, _ := json.Marshal(responseData)
+
+	_, _ = res.Write([]byte(string(jsonData)))
 
 }
