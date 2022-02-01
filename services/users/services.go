@@ -36,24 +36,43 @@ func (st *User) GetUsers() ([]models.User, error) {
 	return users, nil
 }
 
-// TODO: Call getUserById() and return that user
 func (st *User) UpdateUser(id int, user models.User) (*models.User, error) {
-	_, err := st.u.UpdateUser(id, user)
+
+	// Check for negative user id
+	if id < 0 {
+		return nil, errors.New("User id should be greater than 0")
+	}
+
+	// Check for user exists or not for given user id
+	_, err := st.u.GetUserById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = st.u.UpdateUser(id, user)
 
 	if err != nil {
 		return nil, err
 	}
 
-	updatedUser, _ := st.GetUserById(id)
+	// Fetching user after update
+	updatedUser, _ := st.u.GetUserById(id)
 
-	return &updatedUser, nil
+	return updatedUser, nil
 }
 
 func (st *User) DeleteUser(id int) error {
-	err := st.u.DeleteUser(id)
+
+	// Checking user is exist or not before deleing
+	_, err := st.u.GetUserById(id)
+	if err != nil {
+		return err
+	}
+
+	err = st.u.DeleteUser(id)
 
 	if err != nil {
-		return errors.New("Could not able to delete user for given id")
+		return err
 	}
 
 	return nil

@@ -111,21 +111,7 @@ func TestUpdateUser(t *testing.T) {
 			},
 		},
 		{
-			desc:       "Case2",
-			id:         2,
-			user:       models.User{},
-			expectedId: -1,
-			mockCall:   nil,
-		},
-		{
-			desc:       "Case3",
-			id:         -1,
-			user:       models.User{},
-			expectedId: -1,
-			mockCall:   nil,
-		},
-		{
-			desc: "Case4",
+			desc: "Case2",
 			id:   1,
 			user: models.User{
 				Name: "Ridhdhish",
@@ -133,17 +119,6 @@ func TestUpdateUser(t *testing.T) {
 			expectedId: -1,
 			mockCall: []*sqlmock.ExpectedExec{
 				mock.ExpectExec("UPDATE user SET name = ?, WHERE id = ?").WithArgs("Ridhdhish", 1).WillReturnError(errors.New("Connection lost")),
-			},
-		},
-		{
-			desc: "Case5",
-			id:   2,
-			user: models.User{
-				Name: "Ridhdhish",
-			},
-			expectedId: -1,
-			mockCall: []*sqlmock.ExpectedExec{
-				mock.ExpectExec("UPDATE user SET name = ?, WHERE id = ?").WithArgs("Ridhdhish", 2).WillReturnResult(sqlmock.NewResult(0, 0)),
 			},
 		},
 	}

@@ -2,7 +2,6 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"layer/user/models"
 	"layer/user/services"
 	"net/http"
@@ -53,8 +52,18 @@ func (srv Handler) GetUserByIdHandler(res http.ResponseWriter, req *http.Request
 		return
 	}
 
-	jsonData, _ := json.Marshal(user)
-	_, _ = res.Write([]byte(fmt.Sprintf(`{"data": {"user": %v}}`, string(jsonData))))
+	responseData := models.Response{
+		Data: struct {
+			User models.User `json:"user"`
+		}{
+			User: user,
+		},
+		Message:    "Successful operation",
+		StatusCode: 200,
+	}
+
+	jsonData, _ := json.Marshal(responseData)
+	_, _ = res.Write([]byte(jsonData))
 
 }
 
@@ -72,7 +81,11 @@ func (srv Handler) GetUsersHandler(res http.ResponseWriter, req *http.Request) {
 	}
 
 	responseData := models.Response{
-		Data:       users,
+		Data: struct {
+			Users []models.User `json:"users"`
+		}{
+			Users: users,
+		},
 		StatusCode: 200,
 		Message:    "Successful operation",
 	}
@@ -131,9 +144,13 @@ func (srv Handler) UpdateUserHandler(res http.ResponseWriter, req *http.Request)
 	}
 
 	responseData := models.Response{
-		Data:       updatedUser,
+		Data: struct {
+			User *models.User `json:"user"`
+		}{
+			updatedUser,
+		},
 		StatusCode: 201,
-		Message:    "User updated Successfully",
+		Message:    "Successfull operation",
 	}
 
 	jsonData, _ := json.Marshal(responseData)
@@ -176,7 +193,14 @@ func (srv Handler) DeleteUserHandler(res http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	_, _ = res.Write([]byte(`{"data": "user deleted successfully"}`))
+	responseData := models.Response{
+		Message:    "Successfull operation",
+		StatusCode: 200,
+	}
+
+	jsonData, _ := json.Marshal(responseData)
+
+	_, _ = res.Write([]byte(jsonData))
 
 }
 
@@ -207,8 +231,12 @@ func (srv Handler) CreateUserHandler(res http.ResponseWriter, req *http.Request)
 	}
 
 	responseData := models.Response{
-		Data:       createdUser,
-		Message:    "User created successfully",
+		Data: struct {
+			User *models.User `json:"user"`
+		}{
+			createdUser,
+		},
+		Message:    "Successfull operation",
 		StatusCode: 201,
 	}
 

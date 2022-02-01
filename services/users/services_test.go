@@ -104,6 +104,13 @@ func TestUpdateUser(t *testing.T) {
 		Phone: "8320578360",
 		Age:   21,
 	}
+	updatedUser := models.User{
+		Id:    1,
+		Name:  "Ridhdhish",
+		Email: "ridhdhish@gmail.com",
+		Phone: "8320578360",
+		Age:   22,
+	}
 
 	tests := []struct {
 		desc          string
@@ -115,20 +122,38 @@ func TestUpdateUser(t *testing.T) {
 		{
 			desc:          "Case1",
 			id:            1,
-			expectedUser:  expectedUser,
+			expectedUser:  updatedUser,
 			expectedError: nil,
 			mockCall: []*gomock.Call{
-				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(1, nil),
 				mockUserStore.EXPECT().GetUserById(1).Return(&expectedUser, nil),
+				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(1, nil),
+				mockUserStore.EXPECT().GetUserById(1).Return(&updatedUser, nil),
 			},
 		},
 		{
 			desc:          "Case2",
-			id:            2,
+			id:            -1,
 			expectedUser:  models.User{},
-			expectedError: errors.New("Invalid id"),
+			expectedError: errors.New("User id should be greater than 0"),
+			mockCall:      nil,
+		},
+		{
+			desc:          "Case3",
+			id:            100,
+			expectedUser:  models.User{},
+			expectedError: errors.New("User not exists for given user id"),
 			mockCall: []*gomock.Call{
-				mockUserStore.EXPECT().UpdateUser(2, testUser).Return(-1, errors.New("Invalid id")),
+				mockUserStore.EXPECT().GetUserById(100).Return(nil, errors.New("User not exists for given user id")),
+			},
+		},
+		{
+			desc:          "Case4",
+			id:            1,
+			expectedUser:  updatedUser,
+			expectedError: errors.New("Connection lost"),
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().GetUserById(1).Return(&expectedUser, nil),
+				mockUserStore.EXPECT().UpdateUser(1, testUser).Return(-1, errors.New("Connection lost")),
 			},
 		},
 	}
@@ -155,19 +180,33 @@ func TestDeleteUser(t *testing.T) {
 		desc          string
 		id            int
 		expectedError error
-		mockCall      *gomock.Call
+		mockCall      []*gomock.Call
 	}{
 		{
 			desc:          "Case1",
 			id:            1,
 			expectedError: nil,
-			mockCall:      mockUserStore.EXPECT().DeleteUser(1).Return(nil),
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().GetUserById(1).Return(&models.User{}, nil),
+				mockUserStore.EXPECT().DeleteUser(1).Return(nil),
+			},
 		},
 		{
 			desc:          "Case2",
 			id:            2,
-			expectedError: errors.New("Could not able to delete user for given id"),
-			mockCall:      mockUserStore.EXPECT().DeleteUser(2).Return(errors.New("Could not able to delete user for given id")),
+			expectedError: errors.New("User does not exist for given id"),
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().GetUserById(2).Return(nil, errors.New("User does not exist for given id")),
+			},
+		},
+		{
+			desc:          "Case3",
+			id:            1,
+			expectedError: errors.New("Connection lost"),
+			mockCall: []*gomock.Call{
+				mockUserStore.EXPECT().GetUserById(1).Return(&models.User{}, nil),
+				mockUserStore.EXPECT().DeleteUser(1).Return(errors.New("Connection lost")),
+			},
 		},
 	}
 

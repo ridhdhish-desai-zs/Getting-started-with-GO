@@ -67,25 +67,16 @@ Update user for given id
 func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	db := u.db
 
-	if id < 0 {
-		return -1, errors.New("User id must be greater than 0")
-	}
-
 	queryString := "UPDATE user"
 
 	fields, args := formUpdateQuery(id, user)
 
 	if fields != "" {
 		queryString += " SET" + fields + " WHERE id = ?"
-		result, err := db.Exec(queryString, args...)
+		_, err := db.Exec(queryString, args...)
 
 		if err != nil {
 			return -1, errors.New("Internal server error")
-		}
-
-		rows, _ := result.RowsAffected()
-		if rows == 0 {
-			return -1, errors.New("Invalid user id")
 		}
 
 		return id, nil
@@ -94,6 +85,7 @@ func (u *dbStore) UpdateUser(id int, user models.User) (int, error) {
 	return -1, errors.New("Nothing to update. Provide user data to update the user")
 }
 
+// FIXME: Check user is exist or not inside service layer
 /*
 DELETE /api/users/{id}
 Delete user for given id
@@ -107,8 +99,8 @@ func (u *dbStore) DeleteUser(id int) error {
 		return errors.New("Could not delete user for given id")
 	}
 
+	// FIXME: Remove me
 	rowsAffected, _ := result.RowsAffected()
-
 	if rowsAffected == 0 {
 		return errors.New("Could not delete user for given id")
 	}
